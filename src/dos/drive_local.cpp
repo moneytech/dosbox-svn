@@ -326,6 +326,8 @@ bool localDrive::MakeDir(char * dir) {
 	CROSS_FILENAME(newdir);
 #if defined (WIN32)						/* MS Visual C++ */
 	int temp=mkdir(dirCache.GetExpandName(newdir));
+#elif defined (__BADA__)
+	int temp=mkdir(dirCache.GetExpandName(newdir));
 #else
 	int temp=mkdir(dirCache.GetExpandName(newdir),0700);
 #endif
@@ -441,7 +443,7 @@ Bits localDrive::UnMount(void) {
 
 localDrive::localDrive(const char * startdir,Bit16u _bytes_sector,Bit8u _sectors_cluster,Bit16u _total_clusters,Bit16u _free_clusters,Bit8u _mediaid) {
 	strcpy(basedir,startdir);
-	sprintf(info,"local directory %s",startdir);
+	snprintf(info,256,"local directory %s",startdir);
 	allocation.bytes_sector=_bytes_sector;
 	allocation.sectors_cluster=_sectors_cluster;
 	allocation.total_clusters=_total_clusters;
@@ -571,6 +573,8 @@ void localFile::Flush(void) {
 // CDROM DRIVE
 // ********************************************
 
+#ifdef WITH_CDROM
+
 int  MSCDEX_RemoveDrive(char driveLetter);
 int  MSCDEX_AddDrive(char driveLetter, const char* physicalPath, Bit8u& subUnit);
 bool MSCDEX_HasMediaChanged(Bit8u subUnit);
@@ -669,3 +673,4 @@ Bits cdromDrive::UnMount(void) {
 	}
 	return 2;
 }
+#endif

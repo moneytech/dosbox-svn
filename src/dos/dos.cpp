@@ -30,7 +30,12 @@
 #include "dos_inc.h"
 #include "setup.h"
 #include "support.h"
+
+#ifdef WITH_SERIAL
 #include "serialport.h"
+#else
+#include "timer.h"
+#endif
 
 DOS_Block dos;
 DOS_InfoBlock dos_infoblock;
@@ -109,6 +114,7 @@ static Bitu DOS_21Handler(void) {
 		}
 		break;
 	case 0x03:		/* Read character from STDAUX */
+#ifdef WITH_SERIAL
 		{
 			Bit16u port = real_readw(0x40,0);
 			if(port!=0 && serialports[0]) {
@@ -118,8 +124,10 @@ static Bitu DOS_21Handler(void) {
 				serialports[0]->Getchar(&reg_al, &status, true, 0xFFFFFFFF);
 			}
 		}
+#endif
 		break;
 	case 0x04:		/* Write Character to STDAUX */
+#ifdef WITH_SERIAL
 		{
 			Bit16u port = real_readw(0x40,0);
 			if(port!=0 && serialports[0]) {
@@ -130,6 +138,7 @@ static Bitu DOS_21Handler(void) {
 				IO_WriteB(port+4,0x1);
 			}
 		}
+#endif
 		break;
 	case 0x05:		/* Write Character to PRINTER */
 		E_Exit("DOS:Unhandled call %02X",reg_ah);

@@ -238,7 +238,9 @@ static void write_latch(Bitu port,Bitu val,Bitu /*iolen*/) {
 			break;
 		case 0x02:			/* Timer hooked to PC-Speaker */
 //			LOG(LOG_PIT,"PIT 2 Timer at %.3g Hz mode %d",PIT_TICK_RATE/(double)p->cntr,p->mode);
+#ifdef WITH_PCSPEAKER
 			PCSPEAKER_SetCounter(p->cntr,p->mode);
+#endif
 			break;
 		default:
 			LOG(LOG_PIT,LOG_ERROR)("PIT:Illegal timer selected for writing");

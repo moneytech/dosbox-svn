@@ -66,7 +66,7 @@ public:
 		this->reset();
 		language_codes=NULL;
 		use_foreign_layout=false;
-		sprintf(current_keyboard_file_name, "none");
+		snprintf(current_keyboard_file_name, 256, "none");
 	};
 
 	~keyboard_layout();
@@ -194,7 +194,7 @@ static Bit32u read_kcl_file(const char* kcl_file_name, const char* layout_id, bo
 			}
 			if (first_id_only) break;
 			if (lcnum) {
-				sprintf(&lng_codes[lcpos],"%d",lcnum);
+				snprintf(&lng_codes[lcpos],258-lcpos,"%d",lcnum);
 				if (strcasecmp(lng_codes, layout_id)==0) {
 					// language ID found in file, return file position
 					return cur_pos;
@@ -244,7 +244,7 @@ static Bit32u read_kcl_data(Bit8u * kcl_data, Bit32u kcl_data_size, const char* 
 			}
 			if (first_id_only) break;
 			if (lcnum) {
-				sprintf(&lng_codes[lcpos],"%d",lcnum);
+				snprintf(&lng_codes[lcpos],258-lcpos,"%d",lcnum);
 				if (strcasecmp(lng_codes, layout_id)==0) {
 					// language ID found, return position
 					return cur_pos;
@@ -269,7 +269,7 @@ Bitu keyboard_layout::read_keyboard_file(const char* keyboard_file_name, Bit32s 
 
 	char nbuf[512];
 	read_buf_size = 0;
-	sprintf(nbuf, "%s.kl", keyboard_file_name);
+	snprintf(nbuf, 512, "%s.kl", keyboard_file_name);
 	FILE* tempfile = OpenDosboxFile(nbuf);
 	if (tempfile==NULL) {
 		// try keyboard layout libraries next
@@ -614,7 +614,7 @@ Bit16u keyboard_layout::extract_codepage(const char* keyboard_file_name) {
 	Bit32u start_pos=5;
 
 	char nbuf[512];
-	sprintf(nbuf, "%s.kl", keyboard_file_name);
+	snprintf(nbuf, 512, "%s.kl", keyboard_file_name);
 	FILE* tempfile = OpenDosboxFile(nbuf);
 	if (tempfile==NULL) {
 		// try keyboard layout libraries next
@@ -702,25 +702,25 @@ Bitu keyboard_layout::read_codepage_file(const char* codepage_file_name, Bit32s 
 		// select matching .cpi-file for specified codepage
 		switch (codepage_id) {
 			case 437:	case 850:	case 852:	case 853:	case 857:	case 858:	
-						sprintf(cp_filename, "EGA.CPI"); break;
+						snprintf(cp_filename, 512, "EGA.CPI"); break;
 			case 775:	case 859:	case 1116:	case 1117:
-						sprintf(cp_filename, "EGA2.CPI"); break;
+						snprintf(cp_filename, 512, "EGA2.CPI"); break;
 			case 771:	case 772:	case 808:	case 855:	case 866:	case 872:
-						sprintf(cp_filename, "EGA3.CPI"); break;
+						snprintf(cp_filename, 512, "EGA3.CPI"); break;
 			case 848:	case 849:	case 1125:	case 1131:	case 61282:
-						sprintf(cp_filename, "EGA4.CPI"); break;
+						snprintf(cp_filename, 512, "EGA4.CPI"); break;
 			case 737:	case 851:	case 869:
-						sprintf(cp_filename, "EGA5.CPI"); break;
+						snprintf(cp_filename, 512, "EGA5.CPI"); break;
 			case 113:	case 899:	case 59829:	case 60853:
-						sprintf(cp_filename, "EGA6.CPI"); break;
+						snprintf(cp_filename, 512, "EGA6.CPI"); break;
 			case 58152:	case 58210:	case 59234:	case 60258:	case 62306:
-						sprintf(cp_filename, "EGA7.CPI"); break;
+						snprintf(cp_filename, 512, "EGA7.CPI"); break;
 			case 770:	case 773:	case 774:	case 777:	case 778:
-						sprintf(cp_filename, "EGA8.CPI"); break;
+						snprintf(cp_filename, 512, "EGA8.CPI"); break;
 			case 860:	case 861:	case 863:	case 865:
-						sprintf(cp_filename, "EGA9.CPI"); break;
+						snprintf(cp_filename, 512, "EGA9.CPI"); break;
 			case 667:	case 668:	case 790:	case 867:	case 991:	case 57781:
-						sprintf(cp_filename, "EGA10.CPI"); break;
+						snprintf(cp_filename, 512, "EGA10.CPI"); break;
 			default:
 				LOG_MSG("No matching cpi file for codepage %i",codepage_id);
 				return KEYB_INVALIDCPFILE;
@@ -731,7 +731,7 @@ Bitu keyboard_layout::read_codepage_file(const char* codepage_file_name, Bit32s 
 	Bit16u number_of_codepages;
 
 	char nbuf[512];
-	sprintf(nbuf, "%s", cp_filename);
+	snprintf(nbuf, 512, "%s", cp_filename);
 	FILE* tempfile=OpenDosboxFile(nbuf);
 	if (tempfile==NULL) {
 		size_t strsz=strlen(nbuf);

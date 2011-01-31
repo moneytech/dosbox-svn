@@ -310,7 +310,6 @@ void DOSBOX_Init(void) {
 	Section_prop * secprop;
 	Section_line * secline;
 	Prop_int* Pint;
-	Prop_hex* Phex;
 	Prop_string* Pstring;
 	Prop_bool* Pbool;
 	Prop_multival* Pmulti;
@@ -320,14 +319,6 @@ void DOSBOX_Init(void) {
 
 	// Some frequently used option sets
 	const char *rates[] = {  "44100", "48000", "32000","22050", "16000", "11025", "8000", "49716", 0 };
-	const char *oplrates[] = {   "44100", "49716", "48000", "32000","22050", "16000", "11025", "8000", 0 };
-	const char *ios[] = { "220", "240", "260", "280", "2a0", "2c0", "2e0", "300", 0 };
-	const char *irqssb[] = { "7", "5", "3", "9", "10", "11", "12", 0 };
-	const char *dmassb[] = { "1", "5", "0", "3", "6", "7", 0 };
-	const char *iosgus[] = { "240", "220", "260", "280", "2a0", "2c0", "2e0", "300", 0 };
-	const char *irqsgus[] = { "5", "3", "7", "9", "10", "11", "12", 0 };
-	const char *dmasgus[] = { "3", "0", "1", "5", "6", "7", 0 };
-
 
 	/* Setup all the different modules making up DOSBox */
 	const char* machines[] = {
@@ -446,6 +437,7 @@ void DOSBOX_Init(void) {
 	secprop->AddInitFunction(&VGA_Init);
 	secprop->AddInitFunction(&KEYBOARD_Init);
 
+#ifdef WITH_MIXER
 	secprop=control->AddSection_prop("mixer",&MIXER_Init);
 	Pbool = secprop->Add_bool("nosound",Property::Changeable::OnlyAtStart,false);
 	Pbool->Set_help("Enable silent mode, sound is still emulated though.");
@@ -463,7 +455,9 @@ void DOSBOX_Init(void) {
 	Pint = secprop->Add_int("prebuffer",Property::Changeable::OnlyAtStart,20);
 	Pint->SetMinMax(0,100);
 	Pint->Set_help("How many milliseconds of data to keep on top of the blocksize.");
+#endif
 
+#ifdef WITH_MIDI
 	secprop=control->AddSection_prop("midi",&MIDI_Init,true);//done
 	secprop->AddInitFunction(&MPU401_Init,true);//done
 	
@@ -481,10 +475,18 @@ void DOSBOX_Init(void) {
 	Pstring = secprop->Add_string("midiconfig",Property::Changeable::WhenIdle,"");
 	Pstring->Set_help("Special configuration options for the device driver. This is usually the id of the device you want to use.\n"
 	                  "  See the README/Manual for more details.");
+#endif
 
 #if C_DEBUG
 	secprop=control->AddSection_prop("debug",&DEBUG_Init);
 #endif
+
+#ifdef WITH_SBLASTER
+	const char *oplrates[] = {   "44100", "49716", "48000", "32000","22050", "16000", "11025", "8000", 0 };
+	const char *ios[] = { "220", "240", "260", "280", "2a0", "2c0", "2e0", "300", 0 };
+	const char *irqssb[] = { "7", "5", "3", "9", "10", "11", "12", 0 };
+	const char *dmassb[] = { "1", "5", "0", "3", "6", "7", 0 };
+	Prop_hex* Phex;
 
 	secprop=control->AddSection_prop("sblaster",&SBLASTER_Init,true);//done
 	
@@ -525,8 +527,13 @@ void DOSBOX_Init(void) {
 	Pint = secprop->Add_int("oplrate",Property::Changeable::WhenIdle,44100);
 	Pint->Set_values(oplrates);
 	Pint->Set_help("Sample rate of OPL music emulation. Use 49716 for highest quality (set the mixer rate accordingly).");
+#endif
 
 #ifdef WITH_GUS
+	const char *iosgus[] = { "240", "220", "260", "280", "2a0", "2c0", "2e0", "300", 0 };
+	const char *irqsgus[] = { "5", "3", "7", "9", "10", "11", "12", 0 };
+	const char *dmasgus[] = { "3", "0", "1", "5", "6", "7", 0 };
+
 	secprop=control->AddSection_prop("gus",&GUS_Init,true); //done
 	Pbool = secprop->Add_bool("gus",Property::Changeable::WhenIdle,false); 	
 	Pbool->Set_help("Enable the Gravis Ultrasound emulation.");
@@ -555,6 +562,7 @@ void DOSBOX_Init(void) {
 		"with Timidity should work fine.");
 #endif
 
+#ifdef WITH_PCSPEAKER
 	secprop = control->AddSection_prop("speaker",&PCSPEAKER_Init,true);//done
 	Pbool = secprop->Add_bool("pcspeaker",Property::Changeable::WhenIdle,true);
 	Pbool->Set_help("Enable PC-Speaker emulation.");
@@ -562,6 +570,7 @@ void DOSBOX_Init(void) {
 	Pint = secprop->Add_int("pcrate",Property::Changeable::WhenIdle,44100);
 	Pint->Set_values(rates);
 	Pint->Set_help("Sample rate of the PC-Speaker sound generation.");
+#endif
 
 #ifdef WITH_TANDY
 	secprop->AddInitFunction(&TANDYSOUND_Init,true);//done
@@ -661,6 +670,7 @@ void DOSBOX_Init(void) {
 	Pbool = secprop->Add_bool("xms",Property::Changeable::WhenIdle,true);
 	Pbool->Set_help("Enable XMS support.");
 
+#ifdef WITH_EMS
 	secprop->AddInitFunction(&EMS_Init,true);//done
 	const char* ems_settings[] = { "true", "emsboard", "emm386", "false", 0};
 	Pstring = secprop->Add_string("ems",Property::Changeable::WhenIdle,"true");
@@ -669,18 +679,25 @@ void DOSBOX_Init(void) {
 		"compatibility but certain applications may run better with\n"
 		"other choices, or require EMS support to be disabled (=false)\n"
 		"to work at all.");
+#endif
 
+#ifdef WITH_UMB
 	Pbool = secprop->Add_bool("umb",Property::Changeable::WhenIdle,true);
 	Pbool->Set_help("Enable UMB support.");
 
 	secprop->AddInitFunction(&DOS_KeyboardLayout_Init,true);
 	Pstring = secprop->Add_string("keyboardlayout",Property::Changeable::WhenIdle, "auto");
 	Pstring->Set_help("Language code of the keyboard layout (or none).");
+#endif
 
 	// Mscdex
+#ifdef WITH_MSCDEX
 	secprop->AddInitFunction(&MSCDEX_Init);
+#endif
 	secprop->AddInitFunction(&DRIVES_Init);
+#ifdef WITH_CDROM
 	secprop->AddInitFunction(&CDROM_Image_Init);
+#endif
 #if C_IPX
 	secprop=control->AddSection_prop("ipx",&IPX_Init,true);
 	Pbool = secprop->Add_bool("ipx",Property::Changeable::WhenIdle, false);

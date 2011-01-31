@@ -376,18 +376,18 @@ static void FormatNumber(Bitu num,char * buf) {
 	num/=1000;
 	numg=num;
 	if (numg) {
-		sprintf(buf,"%d,%03d,%03d,%03d",numg,numm,numk,numb);
+		snprintf(buf,16,"%d,%03d,%03d,%03d",numg,numm,numk,numb);
 		return;
 	};
 	if (numm) {
-		sprintf(buf,"%d,%03d,%03d",numm,numk,numb);
+		snprintf(buf,16,"%d,%03d,%03d",numm,numk,numb);
 		return;
 	};
 	if (numk) {
-		sprintf(buf,"%d,%03d",numk,numb);
+		snprintf(buf,16,"%d,%03d",numk,numb);
 		return;
 	};
-	sprintf(buf,"%d",numb);
+	snprintf(buf,16,"%d",numb);
 }	
 
 void DOS_Shell::CMD_DIR(char * args) {

@@ -30,7 +30,9 @@
 #include "cross.h"
 #include "regs.h"
 #include "callback.h"
+#ifdef WITH_CDROM
 #include "cdrom.h"
+#endif
 #include "dos_system.h"
 #include "dos_inc.h"
 #include "bios.h"
@@ -104,7 +106,8 @@ public:
 				}
 			return;
 		}
-	   
+
+#ifdef WITH_CDROM
 		// Show list of cdroms
 		if (cmd->FindExist("-cd",false)) {
 			int num = SDL_CDNumDrives();
@@ -114,6 +117,7 @@ public:
 			};
 			return;
 		}
+#endif
 
 		std::string type="dir";
 		cmd->FindString("-t",type,true);
@@ -143,9 +147,9 @@ public:
 				char teststr[1024];
 				Bit16u sizemb = static_cast<Bit16u>(atoi(mb_size.c_str()));
 				if (type=="floppy") {
-					sprintf(teststr,"512,1,2880,%d",sizemb*1024/(512*1));
+					snprintf(teststr,1024,"512,1,2880,%d",sizemb*1024/(512*1));
 				} else {
-					sprintf(teststr,"512,127,16513,%d",sizemb*1024*1024/(512*127));
+					snprintf(teststr,1024,"512,127,16513,%d",sizemb*1024*1024/(512*127));
 				}
 				str_size=teststr;
 			}
@@ -235,6 +239,7 @@ public:
 
 			if (temp_line[temp_line.size()-1]!=CROSS_FILESPLIT) temp_line+=CROSS_FILESPLIT;
 			Bit8u bit8size=(Bit8u) sizes[1];
+#ifdef WITH_CDROM
 			if (type=="cdrom") {
 				int num = -1;
 				cmd->FindInt("-usecd",num,true);
@@ -283,6 +288,9 @@ public:
 					return;
 				}
 			} else {
+#else
+			{
+#endif
 				/* Give a warning when mount c:\ or the / */
 #if defined (WIN32) || defined(OS2)
 				if( (temp_line == "c:\\") || (temp_line == "C:\\") || 
@@ -1203,6 +1211,7 @@ public:
 			if(!((fatDrive *)newdrive)->loadedDisk->hardDrive) {
 				imageDiskList[0] = ((fatDrive *)newdrive)->loadedDisk;
 			}
+#ifdef WITH_MSCDEX
 		} else if (fstype=="iso") {
 			if (Drives[drive-'A']) {
 				WriteOut(MSG_Get("PROGRAM_IMGMOUNT_ALREADY_MOUNTED"));
@@ -1251,7 +1260,7 @@ public:
 				tmp += "; " + paths[i];
 			}
 			WriteOut(MSG_Get("PROGRAM_MOUNT_STATUS_2"), drive, tmp.c_str());
-			
+#endif
 		} else if (fstype=="none") {
 			if(imageDiskList[drive-'0'] != NULL) delete imageDiskList[drive-'0'];
 			imageDiskList[drive-'0'] = newImage;

@@ -30,7 +30,11 @@
 #include "joystick.h"
 #include "mouse.h"
 #include "setup.h"
+#ifdef WITH_SERIALPORT
 #include "serialport.h"
+#else
+#include "dos_inc.h"
+#endif
 
 
 /* if mem_systems 0 then size_extended is reported as the real size else 
@@ -64,6 +68,7 @@ static Bitu INT70_Handler(void) {
 	return 0;
 }
 
+#ifdef WITH_TANDY
 CALLBACK_HandlerObject* tandy_DAC_callback[2];
 static struct {
 	Bit16u port;
@@ -306,6 +311,7 @@ static void TandyDAC_Handler(Bit8u tfunction) {
 		break;
 	}
 }
+#endif
 
 static Bitu INT1A_Handler(void) {
 	switch (reg_ah) {
@@ -341,6 +347,7 @@ static Bitu INT1A_Handler(void) {
 		reg_dl=IO_Read(0x71);
 		CALLBACK_SCF(false);
 		break;
+#ifdef WITH_TANDY
 	case 0x80:	/* Pcjr Setup Sound Multiplexer */
 		LOG(LOG_BIOS,LOG_ERROR)("INT1A:80:Setup tandy sound multiplexer to %d",reg_al);
 		break;
@@ -351,6 +358,7 @@ static Bitu INT1A_Handler(void) {
 	case 0x85:	/* Tandy sound system reset */
 		TandyDAC_Handler(reg_ah);
 		break;
+#endif
 	case 0xb1:		/* PCI Bios Calls */
 		LOG(LOG_BIOS,LOG_ERROR)("INT1A:PCI bios call %2X",reg_al);
 		CALLBACK_SCF(true);
@@ -944,6 +952,7 @@ public:
 		for(Bitu i = 0; i < strlen(b_date); i++) phys_writeb(0xffff5+i,b_date[i]);
 		phys_writeb(0xfffff,0x55); // signature
 
+#ifdef WITH_TANDY
 		tandy_sb.port=0;
 		tandy_dac.port=0;
 		if (use_tandyDAC) {
@@ -986,7 +995,7 @@ public:
 				for (Bit16u i=0; i<0x10; i++) phys_writeb(PhysMake(0xf000,0xa084+i),0x80);
 			} else real_writeb(0x40,0xd4,0x00);
 		}
-	
+#endif
 		/* Setup some stuff in 0x40 bios segment */
 		
 		// port timeouts
@@ -1078,6 +1087,7 @@ public:
 		size_extended|=(IO_Read(0x71) << 8);
 	}
 	~BIOS(){
+#ifdef WITH_TANDY
 		/* abort DAC playing */
 		if (tandy_sb.port) {
 			IO_Write(tandy_sb.port+0xc,0xd3);
@@ -1103,6 +1113,7 @@ public:
 			tandy_DAC_callback[0]=NULL;
 			tandy_DAC_callback[1]=NULL;
 		}
+#endif
 	}
 };
 
