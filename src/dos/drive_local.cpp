@@ -160,8 +160,12 @@ bool localDrive::FileUnlink(char * name) {
 	char *fullname = dirCache.GetExpandName(newname);
 	if (unlink(fullname)) {
 		//Unlink failed for some reason try finding it.
+#ifdef __BADA__
+		if(access(fullname,F_OK)) return false; // No files found
+#else
 		struct stat buffer;
 		if(stat(fullname,&buffer)) return false; // File not found.
+#endif
 
 		FILE* file_writable = fopen(fullname,"rb+");
 		if(!file_writable) return false; //No acces ? ERROR MESSAGE NOT SET. FIXME ?
@@ -346,6 +350,16 @@ bool localDrive::RemoveDir(char * dir) {
 	return (temp==0);
 }
 
+#ifdef __BADA__
+bool localDrive::TestDir(char * dir) {
+	char newdir[CROSS_LEN];
+	strcpy(newdir,basedir);
+	strcat(newdir,dir);
+	CROSS_FILENAME(newdir);
+	dirCache.ExpandName(newdir);
+	return bada_IsDirExist(newdir);
+}
+#else
 bool localDrive::TestDir(char * dir) {
 	char newdir[CROSS_LEN];
 	strcpy(newdir,basedir);
@@ -363,6 +377,7 @@ bool localDrive::TestDir(char * dir) {
 	int temp=access(newdir,F_OK);
 	return (temp==0);
 }
+#endif
 
 bool localDrive::Rename(char * oldname,char * newname) {
 	char newold[CROSS_LEN];

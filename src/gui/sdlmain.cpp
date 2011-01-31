@@ -1626,11 +1626,18 @@ static void launchcaptures(std::string const& edit) {
 	Cross::CreatePlatformConfigDir(path);
 	path += file;
 	Cross::CreateDir(path);
+#ifdef __BADA__
+	if(!bada_IsDirExist(path.c_str())) {
+		printf("%s doesn't exists or isn't a directory.\n",path.c_str());
+		exit(1);
+	}
+#else
 	struct stat cstat;
 	if(stat(path.c_str(),&cstat) || (cstat.st_mode & S_IFDIR) == 0) {
 		printf("%s doesn't exists or isn't a directory.\n",path.c_str());
 		exit(1);
 	}
+#endif
 /*	if(edit.empty()) {
 		printf("no editor specified.\n");
 		exit(1);

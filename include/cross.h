@@ -98,10 +98,15 @@ typedef struct dir_struct {
 	WIN32_FIND_DATA search_data;
 } dir_information;
 
-#else
+#elif defined (__BADA__)
 
-//#include <sys/types.h> //Included above
-//#include <dirent.h>
+typedef struct dir_struct {
+	void* dir; //Directory instance
+	void* num; //Content enumerator
+	char base_path[CROSS_LEN];
+} dir_information;
+
+#else
 
 typedef struct dir_struct { 
 	DIR*  dir;

@@ -195,6 +195,62 @@ void close_directory(dir_information* dirp) {
 	}
 }
 
+#elif defined(__BADA__)
+
+#include <FIoDirectory.h>
+using namespace Osp::Io;
+
+dir_information* open_directory(const char* dirname) {
+	static dir_information dir = {0};
+	Directory *pDir = new Directory;
+	result r = pDir->Construct(dirname);
+	if (E_SUCCESS == r) {
+		safe_strncpy(dir.base_path,dirname,CROSS_LEN);
+		dir.dir = (void*)pDir;
+		return &dir;
+	}else{
+		delete pDir;
+		return NULL;
+	}
+}
+
+bool read_directory_first(dir_information* dirp, char* entry_name, bool& is_directory) {
+	if (!dirp) return false;
+	if (!dirp->dir) return false;
+	Directory *pDir = (Directory *)dirp->dir;
+	DirEnumerator *pNum = pDir->ReadN();
+	if (!pNum) return false;
+	if (E_SUCCESS != pNum->MoveNext()) return false;
+	DirEntry ent = pNum->GetCurrentDirEntry();
+	is_directory = ent.IsDirectory();
+	wcstombs(entry_name, ent.GetName().GetPointer(), CROSS_LEN);
+	entry_name[CROSS_LEN-1] = 0;
+	return true;
+}
+
+bool read_directory_next(dir_information* dirp, char* entry_name, bool& is_directory) {
+	if (!dirp) return false;
+	if (!dirp->num) return false;
+	DirEnumerator *pNum = (DirEnumerator *)dirp->num;
+	if (!pNum) return false;
+	if (E_SUCCESS != pNum->MoveNext()) return false;
+	DirEntry ent = pNum->GetCurrentDirEntry();
+	is_directory = ent.IsDirectory();
+	wcstombs(entry_name, ent.GetName().GetPointer(), CROSS_LEN);
+	entry_name[CROSS_LEN-1] = 0;
+	return true;
+}
+
+void close_directory(dir_information* dirp) {
+	Directory *pDir = (Directory *)dirp->dir;
+	delete pDir;
+	DirEnumerator *pNum = (DirEnumerator *)dirp->num;
+	delete pNum;
+	dirp->dir = 0;
+	dirp->num = 0;
+	memset(dirp->base_path, 0, sizeof(dirp->base_path));
+}
+
 #else
 
 dir_information* open_directory(const char* dirname) {
