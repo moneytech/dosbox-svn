@@ -23,6 +23,7 @@
 #include "setup.h"
 #include "control.h"
 #include "support.h"
+#include "SDL/SDL.h"
 #include <fstream>
 #include <string>
 #include <sstream>
@@ -290,7 +291,7 @@ bool Prop_string::CheckValue(Value const& in, bool warn){
 		}
 		if((*it).ToString() == "%u") {
 			Bitu value;
-			if(sscanf(in.ToString().c_str(),"%u",&value) == 1) {
+			if(SDL_sscanf(in.ToString().c_str(),"%u",&value) == 1) {
 				return true;
 			}
 		}
@@ -890,7 +891,7 @@ bool CommandLine::FindHex(char const * const name,int & value,bool remove) {
 	cmd_it it,it_next;
 	if (!(FindEntry(name,it,true))) return false;
 	it_next=it;it_next++;
-	sscanf((*it_next).c_str(),"%X",&value);
+	SDL_sscanf((*it_next).c_str(),"%X",&value);
 	if (remove) cmds.erase(it,++it_next);
 	return true;
 }

@@ -236,9 +236,9 @@ void GFX_SetTitle(Bit32s cycles,Bits frameskip,bool paused){
 	if(cycles != -1) internal_cycles = cycles;
 	if(frameskip != -1) internal_frameskip = frameskip;
 	if(CPU_CycleAutoAdjust) {
-		sprintf(title,"DOSBox %s, CPU speed: max %3d%% cycles, Frameskip %2d, Program: %8s",VERSION,internal_cycles,internal_frameskip,RunningProgram);
+		snprintf(title,200,"DOSBox %s, CPU speed: max %3d%% cycles, Frameskip %2d, Program: %8s",VERSION,internal_cycles,internal_frameskip,RunningProgram);
 	} else {
-		sprintf(title,"DOSBox %s, CPU speed: %8d cycles, Frameskip %2d, Program: %8s",VERSION,internal_cycles,internal_frameskip,RunningProgram);
+		snprintf(title,200,"DOSBox %s, CPU speed: %8d cycles, Frameskip %2d, Program: %8s",VERSION,internal_cycles,internal_frameskip,RunningProgram);
 	}
 
 	if(paused) strcat(title," PAUSED");
@@ -1452,7 +1452,7 @@ void GFX_ShowMsg(char const* format,...) {
 	char buf[512];
 	va_list msg;
 	va_start(msg,format);
-	vsprintf(buf,format,msg);
+	vsnprintf(buf,512,format,msg);
         strcat(buf,"\n");
 	va_end(msg);
 	if(!no_stdout) printf("%s",buf); //Else buf is parsed again.
@@ -1770,7 +1770,7 @@ int main(int argc, char* argv[]) {
 
 	/* Init SDL */
 #if SDL_VERSION_ATLEAST(1, 2, 14)
-	putenv(const_cast<char*>("SDL_DISABLE_LOCK_KEYS=1"));
+	SDL_putenv(const_cast<char*>("SDL_DISABLE_LOCK_KEYS=1"));
 #endif
 	if ( SDL_Init( SDL_INIT_AUDIO|SDL_INIT_VIDEO|SDL_INIT_TIMER|SDL_INIT_CDROM
 		|SDL_INIT_NOPARACHUTE

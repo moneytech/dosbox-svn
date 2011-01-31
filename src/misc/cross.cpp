@@ -62,6 +62,8 @@ void Cross::GetPlatformConfigDir(std::string& in) {
 #elif defined(MACOSX)
 	in = "~/Library/Preferences";
 	ResolveHomedir(in);
+#elif defined(__BADA__)
+	in = "/Home";
 #else
 	in = "~/.dosbox";
 	ResolveHomedir(in);
@@ -89,6 +91,9 @@ void Cross::CreatePlatformConfigDir(std::string& in) {
 	in = "~/Library/Preferences/";
 	ResolveHomedir(in);
 	//Don't create it. Assume it exists
+#elif defined(__BADA__)
+	in = "/Home";
+	//bada app home always exists
 #else
 	in = "~/.dosbox";
 	ResolveHomedir(in);
@@ -116,6 +121,8 @@ void Cross::ResolveHomedir(std::string & temp_line) {
 
 void Cross::CreateDir(std::string const& in) {
 #ifdef WIN32
+	mkdir(in.c_str());
+#elif defined(__BADA__)
 	mkdir(in.c_str());
 #else
 	mkdir(in.c_str(),0700);

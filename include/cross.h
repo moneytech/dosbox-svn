@@ -26,7 +26,11 @@
 #endif
 
 #include <stdio.h>
+#ifdef __BADA__
+#include <../src/misc/bada_stat.h>
+#else
 #include <sys/stat.h>
+#endif
 #include <sys/types.h>
 #include <string>
 
@@ -37,7 +41,12 @@
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
 #else										/* LINUX / GCC */
+#ifdef __BADA__
+#include <../src/misc/bada_dirent.h>
+#include <../src/misc/bada_cross.h>
+#else
 #include <dirent.h>
+#endif
 #include <unistd.h>
 #define LONGTYPE(a) a##LL
 #endif
@@ -92,7 +101,7 @@ typedef struct dir_struct {
 #else
 
 //#include <sys/types.h> //Included above
-#include <dirent.h>
+//#include <dirent.h>
 
 typedef struct dir_struct { 
 	DIR*  dir;

@@ -177,7 +177,7 @@ void E_Exit(const char * format,...) {
 #endif
 	va_list msg;
 	va_start(msg,format);
-	vsprintf(buf,format,msg);
+	vsnprintf(buf,1024,format,msg);
 	va_end(msg);
 	strcat(buf,"\n");
 
