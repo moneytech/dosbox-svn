@@ -526,7 +526,7 @@ void DOSBOX_Init(void) {
 	Pint->Set_values(oplrates);
 	Pint->Set_help("Sample rate of OPL music emulation. Use 49716 for highest quality (set the mixer rate accordingly).");
 
-
+#ifdef WITH_GUS
 	secprop=control->AddSection_prop("gus",&GUS_Init,true); //done
 	Pbool = secprop->Add_bool("gus",Property::Changeable::WhenIdle,false); 	
 	Pbool->Set_help("Enable the Gravis Ultrasound emulation.");
@@ -553,6 +553,7 @@ void DOSBOX_Init(void) {
 		"there should be a MIDI directory that contains\n"
 		"the patch files for GUS playback. Patch sets used\n"
 		"with Timidity should work fine.");
+#endif
 
 	secprop = control->AddSection_prop("speaker",&PCSPEAKER_Init,true);//done
 	Pbool = secprop->Add_bool("pcspeaker",Property::Changeable::WhenIdle,true);
@@ -562,6 +563,7 @@ void DOSBOX_Init(void) {
 	Pint->Set_values(rates);
 	Pint->Set_help("Sample rate of the PC-Speaker sound generation.");
 
+#ifdef WITH_TANDY
 	secprop->AddInitFunction(&TANDYSOUND_Init,true);//done
 	const char* tandys[] = { "auto", "on", "off", 0};
 	Pstring = secprop->Add_string("tandy",Property::Changeable::WhenIdle,"auto");
@@ -571,11 +573,14 @@ void DOSBOX_Init(void) {
 	Pint = secprop->Add_int("tandyrate",Property::Changeable::WhenIdle,44100);
 	Pint->Set_values(rates);
 	Pint->Set_help("Sample rate of the Tandy 3-Voice generation.");
+#endif
 
+#ifdef WITH_DISNEY
 	secprop->AddInitFunction(&DISNEY_Init,true);//done
 	
 	Pbool = secprop->Add_bool("disney",Property::Changeable::WhenIdle,true);
 	Pbool->Set_help("Enable Disney Sound Source emulation. (Covox Voice Master and Speech Thing compatible).");
+#endif
 
 	secprop=control->AddSection_prop("joystick",&BIOS_Init,false);//done
 	secprop->AddInitFunction(&INT10_Init);
@@ -606,6 +611,7 @@ void DOSBOX_Init(void) {
 	Pbool = secprop->Add_bool("buttonwrap",Property::Changeable::WhenIdle,false);
 	Pbool->Set_help("enable button wrapping at the number of emulated buttons.");
 
+#ifdef WITH_SERIAL
 	secprop=control->AddSection_prop("serial",&SERIAL_Init,true);
 	const char* serials[] = { "dummy", "disabled", "modem", "nullmodem",
 	                          "directserial",0 };
@@ -647,7 +653,7 @@ void DOSBOX_Init(void) {
 	Pstring->Set_values(serials);
 	Pstring = Pmulti_remain->GetSection()->Add_string("parameters",Property::Changeable::WhenIdle,"");
 	Pmulti_remain->Set_help("see serial1");
-
+#endif
 
 	/* All the DOS Related stuff, which will eventually start up in the shell */
 	secprop=control->AddSection_prop("dos",&DOS_Init,false);//done

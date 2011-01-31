@@ -97,7 +97,7 @@ void AutoexecObject::CreateAutoexec(void) {
 		if ((auto_len+(*it).length()+3)>AUTOEXEC_SIZE) {
 			E_Exit("SYSTEM:Autoexec.bat file overflow");
 		}
-		sprintf((autoexec_data+auto_len),"%s\r\n",(*it).c_str());
+		snprintf((autoexec_data+auto_len),(AUTOEXEC_SIZE-auto_len),"%s\r\n",(*it).c_str());
 	}
 	if(first_shell) VFILE_Register("AUTOEXEC.BAT",(Bit8u *)autoexec_data,(Bit32u)strlen(autoexec_data));
 }
